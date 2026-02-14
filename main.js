@@ -35,6 +35,7 @@ submitFormBtn.addEventListener("click", async (e) => {
   }
 
   AddQuestions(finalQuestion, 0);
+  // corected(finalQuestion, 0);
   questionsCountSelector.innerHTML = `${1} من ${questionValue} `;
   let categoryName = document.querySelector(".category span");
 
@@ -107,13 +108,22 @@ subBtn.onclick = function () {
       icon: "success",
       title: "انتهى الاختبار",
       html: `نتيجتك ${score} من ${finalQuestion.length} 🎉`,
-    }).then(() => {
-      window.location.reload();
+      confirmButtonText: 'عرض الإجابات الصحيحة',
+    }).then((result) => {
+      // window.location.reload();
+      if (result.isConfirmed) {
+        // هنا نختار الديف ونغير الـ display
+        document.querySelector(".answers-container").style.display = "block";
+        document
+          .querySelector(".answers-container")
+          .scrollIntoView({ behavior: "smooth" });
+      }
     });
 
     // return;
   }
   AddQuestions(finalQuestion, cur);
+  // corected(finalQuestion,cur)
   questionsCountSelector.innerHTML = `${cur + 1} من ${questionValue} `;
 };
 
@@ -142,6 +152,7 @@ function checkAnswer(index) {
   if (selectedLabel === rAnswer) {
     score++;
   }
+  corected(finalQuestion, cur, selectedLabel);
 }
 
 function setTomes() {
@@ -175,11 +186,54 @@ function setTomes() {
           text: " الوقت خلص",
         });
         // هنا ممكن تعمل إعادة تحميل الصفحة أو أي إجراء تاني
-        setTimeout(()=>{
-          location.reload()
-        }
-      ,5000)
+        setTimeout(() => {
+          location.reload();
+        }, 5000);
       }
     }, 1000);
   }
+}
+let containerAnser = document.querySelector(".answers-container");
+function corected(paper, cur, slect) {
+  let qustionDiv = document.createElement("div");
+  qustionDiv.className = "comper";
+  let questionHead = document.createElement("h2");
+  qustionDiv.appendChild(document.createTextNode(paper[cur].title));
+  qustionDiv.appendChild(questionHead);
+  for (let i = 1; i <= 4; i++) {
+    let ans = document.createElement("div");
+    ans.className = `answer-${i}`;
+    ans.textContent = `${i} - ${paper[cur][`answer_${i}`]}`;
+    qustionDiv.appendChild(ans);
+  }
+  let dalelDiv = document.createElement("div")
+  dalelDiv.className = "dalel"
+  let spanchose = document.createElement("span")
+  spanchose.appendChild(document.createTextNode("الاجابه المختارة"))
+  dalelDiv.appendChild(spanchose)
+  let spanCorect = document.createElement("span")
+  spanCorect.appendChild(document.createTextNode("الاجابه الصحيحه"))
+  dalelDiv.appendChild(spanCorect)
+  qustionDiv.appendChild(dalelDiv)
+
+
+
+  let resultDiv = document.createElement("div");
+
+  resultDiv.className = "res";
+  let chosenDiv = document.createElement("div");
+  chosenDiv.className = "chosen";
+  chosenDiv.textContent = slect;
+
+  let corectDiv = document.createElement("div");
+  corectDiv.textContent = paper[cur].right_answer;
+  if (corectDiv.textContent === chosenDiv.textContent) {
+    qustionDiv.classList.add("corect");
+  } else {
+    qustionDiv.classList.add("wrong");
+  }
+  corectDiv.className = "corect";
+  resultDiv.append(chosenDiv,corectDiv);
+  qustionDiv.appendChild(resultDiv);
+  containerAnser.appendChild(qustionDiv);
 }
